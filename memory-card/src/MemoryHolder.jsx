@@ -1,9 +1,8 @@
 import { useState, useEffect} from "react";
 import MemoryCard from "./MemoryCard";
-function MemoryHolder({turn, setTurn, detailedPokemonList, setDetailedPokemonList}){
+function MemoryHolder({turn, randomOffset, detailedPokemonList, setDetailedPokemonList}){
     const [loading, setLoading] = useState(true);
     let numcards = turn;
-    const randomOffset = Math.floor(Math.random() * 1000 ); 
     console.log(randomOffset)
     if (turn > 12){
         numcards = turn;
@@ -28,7 +27,7 @@ useEffect(() =>{const fetchPokemons = async() =>{
             } )
           );
           const filteredPokemonList = detailedPokemons.filter(
-            (pokemon) => pokemon.id % 3 === 2
+            (pokemon) => pokemon.id % 3 === 1
           );
           setLoading(true);
           setDetailedPokemonList(filteredPokemonList);
