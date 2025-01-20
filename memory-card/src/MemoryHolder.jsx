@@ -15,7 +15,7 @@ useEffect(() =>{const fetchPokemons = async() =>{
           }
           const data = await response.json();
           const detailedPokemons = await Promise.all(
-            data.results.map(async (pokemon,index) =>{
+            data.results.map(async (pokemon) =>{
                 const detailsResponse = await fetch(pokemon.url);
                 const details = await detailsResponse.json();
                 return{
@@ -44,7 +44,7 @@ if(loading == false){
 }
 console.log(detailedPokemonList)
 return (
-    <>
+    <div id = "memoryholder">
       {detailedPokemonList.length > 0 ? (
         detailedPokemonList.map((pokemon) => (
           <MemoryCard
@@ -56,6 +56,6 @@ return (
       ) : (
         <p>Loading Pokémon...</p>
       )}
-    </>)
+    </div>)
 }
 export default MemoryHolder;

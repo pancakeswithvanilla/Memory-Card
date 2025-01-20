@@ -66,3 +66,33 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+#root{
+  width:100%;
+}
+#memoryholder {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 cards per row */
+  grid-gap: 20px; /* Adjust the gap between cards */
+  margin: 20px; /* Optional: Add margin around the grid */
+}
+
+
+.memorycard {
+  /* Optional: You can add some styles for the individual MemoryCard */
+  box-sizing: border-box;
+  background-color:bisque;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid black; /* Adds a black border around the card */
+}
+.memorycard img {
+  width: 150px;
+  height: auto;
+  border-radius: 8px;
+}
+.memorycard h3 {
+  padding: 2px; /* Adjust the padding of h3 */
+  margin: 0; /* Optional: remove any default margin */
+}
