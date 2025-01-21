@@ -1,9 +1,8 @@
 import { useState, useEffect} from "react";
 import MemoryCard from "./MemoryCard";
-function MemoryHolder({turn, randomOffset, detailedPokemonList, setDetailedPokemonList}){
+function MemoryHolder({turn, setTurn, randomOffset, detailedPokemonList, setDetailedPokemonList}){
     const [loading, setLoading] = useState(true);
     let numcards = turn;
-    console.log(randomOffset)
     if (turn > 12){
         numcards = turn;
     }
@@ -38,11 +37,48 @@ useEffect(() =>{const fetchPokemons = async() =>{
     }
 };
 fetchPokemons();
-}, [])
+},[])
+
+useEffect(() =>{
+  const memoryCards = document.querySelectorAll(".memorycard");
+  if(memoryCards.length > 0){
+    memoryCards.forEach(card =>{
+      card.addEventListener("click", handleClick);
+    });
+  }
+  return () => {
+    if (memoryCards.length > 0) {
+      memoryCards.forEach((card) => {
+        card.removeEventListener("click", handleClick);
+      });
+    }
+  };
+
+}, [turn, detailedPokemonList])
+
+useEffect(() =>{
+  const uniqueRandomIndices = new Set();
+
+while (uniqueRandomIndices.size < 4) {
+  const randomOffset = Math.floor(Math.random() * 12); 
+  uniqueRandomIndices.add(randomOffset);
+}
+
+const indicesArray = Array.from(uniqueRandomIndices); 
+
+}, [turn])
+
+
+
+function handleClick(){
+  setTurn((prevTurn) =>{
+    const newTurn = prevTurn + 1;
+    return newTurn;
+  });
+}
 if(loading == false){
     return(<><h3>Loading Pokemon data...</h3></>)
 }
-console.log(detailedPokemonList)
 return (
     <div id = "memoryholder">
       {detailedPokemonList.length > 0 ? (
