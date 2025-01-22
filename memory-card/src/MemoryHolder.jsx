@@ -157,7 +157,12 @@ if(loading == false){
 }
 
 return (
-    <div id = "memoryholder">
+  <div id = "container">
+    <div id = "header">
+      <h2 id ="memgame">Pokemon Memory Game</h2>
+    <h3 id ="inst">Win by never clicking on the same Pokemon twice!</h3>
+    <div id = "turntracker"><h3>Turn: {turn}</h3></div></div>
+     <div id = "memoryholder">
       {detailedPokemonList.length > 0 ? (
         detailedPokemonList.map((pokemon) => (
           <MemoryCard
@@ -170,6 +175,8 @@ return (
       ) : (
         <p>Loading Pokémon...</p>
       )}
-    </div>)
+    </div>
+  </div>
+   )
 }
 export default MemoryHolder;
