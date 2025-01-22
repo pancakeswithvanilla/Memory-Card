@@ -1,26 +1,20 @@
 import { useState, useEffect} from "react";
 import MemoryCard from "./MemoryCard";
-function MemoryHolder({turn, setTurn, randomOffset, detailedPokemonList, setDetailedPokemonList}){
+function MemoryHolder({turn, setTurn, detailedPokemonList, setDetailedPokemonList, gameOver, setGameOver}){
     const [loading, setLoading] = useState(true);
     const [clickedPokis, setClickedPokis] = useState([]);
-    const [gameOver, setGameOver] = useState(false);
-    const [numCards, setNumCards] = useState(12);
     const [removedPokis, setRemovedPokis] = useState(false);
-    const [pokiIndices, setPokiIndices] = useState([])
-    if (turn > 12){
-        setNumCards(turn);
-    }
-    const fetchPokemons = async(numfetches, randfetch) =>{
+    const [randomOffset, setRandomOffset] = useState(Math.floor(Math.random() * 100 ))
+    const numCards = 12;
+    const moreChallenging = 4;
+    const evenMoreChallenging = 8;
+    const fetchPokemons = async(numfetches) =>{
       try{
           if (numfetches == null){
             numfetches = numCards * 3;
           }
-          if (randfetch == null){
-            randfetch = randomOffset;
-          }
-          console.log("Numfetches", numfetches)
-          console.log("Randfetch", randfetch)
-          const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${numfetches}&offset=${randfetch}`);
+
+          const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${numfetches}&offset=${randomOffset}`);
           if (!response.ok) {
               throw new Error('Failed to fetch Pokémon list');
             }
@@ -52,6 +46,8 @@ function MemoryHolder({turn, setTurn, randomOffset, detailedPokemonList, setDeta
     const loadPokemons = async () => {
       const filteredPokemonList = await fetchPokemons();
       setDetailedPokemonList(filteredPokemonList);
+      setRandomOffset((prevRandomOffset) =>prevRandomOffset + numCards *3);
+
       setLoading(true);
     };
   
@@ -76,8 +72,15 @@ useEffect(() =>{
 }, [turn, detailedPokemonList])
 
 useEffect(() => {
-  if (detailedPokemonList.length > 4) { 
-    const indicesToRemove = chooseIndices(4, detailedPokemonList.length);
+  let toRemove = 4;
+  if (turn >= moreChallenging){
+    toRemove = 2;
+  }
+  else if (turn >= evenMoreChallenging){
+    toRemove = 1;
+  }
+  if (detailedPokemonList.length > toRemove) { 
+    const indicesToRemove = chooseIndices(toRemove, detailedPokemonList.length);
     setDetailedPokemonList((prevDetailedPokemonList) => {
       return prevDetailedPokemonList.filter(
         (_, index) => !indicesToRemove.includes(index)
@@ -88,40 +91,24 @@ useEffect(() => {
 }, [turn]);
 
 useEffect(() => {
+  let pokistoadd = 12;
+  if (turn >= moreChallenging){
+    pokistoadd = 6;
+  }
+  else if (turn >= evenMoreChallenging){
+    pokistoadd = 3;
+  }
   if (removedPokis) {
     const loadPokemons = async () => {
       let addPokemonList = [];
-      let overlapFound = true;
-      let iterationCount = 0;  // To limit the number of iterations
-
-      while (overlapFound && iterationCount < 10) { // Prevent infinite loop
-        addPokemonList = await fetchPokemons(12);
-        const newFirstId = addPokemonList[0].id;
-        const newLastId = addPokemonList[addPokemonList.length - 1].id;
-
-        const detFirstId = detailedPokemonList[0].id;
-        const detLastId = detailedPokemonList[detailedPokemonList.length - 1].id;
-
-        overlapFound = 
-          (newFirstId >= detFirstId && newFirstId <= detLastId) || 
-          (newLastId >= detFirstId && newLastId <= detLastId);
-
-        console.log('newFirstId:', newFirstId);
-        console.log('newLastId:', newLastId);
-        console.log('detFirstId:', detFirstId);
-        console.log('detLastId:', detLastId);
-        console.log("Iteration count", iterationCount);
-
-        iterationCount++; // Increment iteration count
-      }
-
-      // If the loop ended due to too many iterations, we can still proceed
+      addPokemonList = await fetchPokemons(pokistoadd);
+      setRandomOffset((prevRandomOffset) =>prevRandomOffset + pokistoadd);
       const allPokemons = [...detailedPokemonList, ...addPokemonList];
+      //console.log("All pokemons:", allPokemons)
       const shuffledPokemons = shuffleArray(allPokemons);
-
-      // Set the shuffled Pokémon list
+      //console.log("Shuffled pokemons", shuffledPokemons);
       setDetailedPokemonList(shuffledPokemons);
-      setRemovedPokis(false); // Reset the flag for the next turn
+      setRemovedPokis(false); 
     };
 
     loadPokemons();
@@ -129,10 +116,10 @@ useEffect(() => {
 }, [removedPokis]);
 
 const shuffleArray = (array) => {
-  let shuffledArray = [...array]; // Make a copy of the array
+  let shuffledArray = [...array]; 
   for (let i = shuffledArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]; // Swap elements
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]; 
   }
   return shuffledArray;
 };
@@ -154,7 +141,6 @@ const handleClick = (card) => {
     if (poki.id == cardId){
       setClickedPokis((prevClickedPokis) =>[...prevClickedPokis, poki])
     }
-    console.log("Clicked pokis", clickedPokis);
   })
 
 };
@@ -162,7 +148,6 @@ useEffect(() =>{
   const clickedPokisSet = new Set(clickedPokis);
   if(clickedPokisSet.size != clickedPokis.length && clickedPokis.length > 0){
     setGameOver(true);
-    console.log("Game over!");
   }
 },[clickedPokis])
 
@@ -171,9 +156,6 @@ if(loading == false){
     return(<><h3>Loading Pokemon data...</h3></>)
 }
 
-if (gameOver == true){
-  return(<><h3>Game Over...</h3></>)
-}
 return (
     <div id = "memoryholder">
       {detailedPokemonList.length > 0 ? (

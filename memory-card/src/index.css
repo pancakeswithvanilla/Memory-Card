@@ -71,8 +71,9 @@ button:focus-visible {
   width:100%;
 }
 #memoryholder {
+  width: 100%;
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 cards per row */
+  grid-template-columns: repeat(6, 1fr); /* 4 cards per row */
   grid-gap: 20px; /* Adjust the gap between cards */
   margin: 20px; /* Optional: Add margin around the grid */
 }
@@ -88,7 +89,7 @@ button:focus-visible {
   border: 2px solid black; /* Adds a black border around the card */
 }
 .memorycard img {
-  width: 150px;
+  width: 175px;
   height: auto;
   border-radius: 8px;
 }
